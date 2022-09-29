@@ -9,3 +9,4 @@
 [ ] Comentar tudo, seja feliz, comente o quanto quiser!
 [ ] Analisar projeto original e refatorar o seu pra conseguir o melhor dos dois mundos :)
 [ ] FAZER DOCUMENTAÇÃO, MUITO IMPORTANTE !!!! NÃO EMPURRE A DOCUMENTAÇÃO COM A BARRIGA! É ALGO RÁPIDO E SIMPLES
+[ ] Alterar descrição do projeto
