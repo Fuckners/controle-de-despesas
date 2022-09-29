@@ -1,3 +1,5 @@
+export {}; // pro typescript não reclamar de ter 2 arquivos com os mesmos nomes de veriáveis
+
 interface transaction {
     id :number
     name :string
@@ -25,7 +27,7 @@ const plusElement = document.getElementById('money-plus') as HTMLParagraphElemen
 
     const savedTransactions :Array<transaction> = JSON.parse(localStorage.getItem('transações')!) || [];
 
-    savedTransactions.forEach(({ name, amount } :transaction) => addTransactionDOM(name, amount));
+    savedTransactions.forEach(({ id, name, amount } :transaction) => addTransactionDOM(id, name, amount));
 })();
 
 // "gambiarra" pra gerar o ID
@@ -58,19 +60,19 @@ function alterBalance(amount :number) :void {
 
         localStorage.setItem('receita', newPlus.toString());
         plusElement.innerText = `R$ ${newPlus.toFixed(2)}`;
-        return
-    } // else
-    
-    // caso o valor seja negativo
-    const currentExpense :number = +localStorage.getItem('despesa')!;
 
-    const newMinus :number = currentExpense + amount;
+    } else {
+        // caso o valor seja negativo
+        const currentExpense :number = +localStorage.getItem('despesa')!;
 
-    localStorage.setItem('despesa', newMinus.toString());
-    minusElement.innerText = `R$ ${newMinus.toFixed(2)}`;
+        const newMinus :number = currentExpense + amount;
+
+        localStorage.setItem('despesa', newMinus.toString());
+        minusElement.innerText = `R$ ${newMinus.toFixed(2)}`;
+    }
 }
 
-function addTransactionDOM(name :string, amount :number) :void {
+function addTransactionDOM(id :number, name :string, amount :number) :Function {
     // transactionContainer.innerHTML += `
     // <li class="${amount < 0 ? 'minus' : 'plus'}">
     //     ${name} <span>${amount}</span><button class="delete-btn">x</button>
@@ -85,22 +87,37 @@ function addTransactionDOM(name :string, amount :number) :void {
     const btn :HTMLButtonElement = document.createElement('button');
         btn.classList.add('delete-btn');
         btn.innerText = 'x';
-        btn.addEventListener('click', () :void => contant.remove());
+        btn.addEventListener('click', () :void => removeTransaction(contant, id));
 
-    contant.append(name); // append pode adicionar string
-    contant.append(span, btn); // appendChild pode adicionar somente elementos
+    contant.append(name, span, btn); // append pode adicionar string e ou elementos (podem ser mais de 1 ao mesmo tempo)
+    // appendChild pode adicionar somente elementos
 
     transactionContainer.appendChild(contant);
 
-    const transactionsArray :Array<transaction> = JSON.parse(localStorage.getItem('transações')!) || [];
-    transactionsArray.push({ id: generateId(), name, amount });
-    localStorage.setItem('transações', JSON.stringify(transactionsArray));
+    return () => { // tentativa de usar currying, não sei se está certo, mas torço que sim
+        const transactions :Array<transaction> = JSON.parse(localStorage.getItem('transações')!) || [];
+        transactions.push({ id, name, amount });
+        localStorage.setItem('transações', JSON.stringify(transactions));
+    }
 }
 
 function removeTransaction(element :HTMLLIElement, id :number) {
+    element.remove();
+    const transactions :Array<transaction> = JSON.parse(localStorage.getItem('transações')!) || [];
+    console.log(transactions);
     
+    const transaction :transaction = transactions.filter((trans :transaction) => trans.id == id)[0];
+    console.log(id);
+    console.log(transaction);
+    
+    alterBalance(transaction.amount * -1);
+
+    const filteredTransactions :Array<transaction> = transactions.filter((trans :transaction) => trans.id != id);
+    
+    localStorage.setItem('transações', JSON.stringify(filteredTransactions));
 }
 
+// função para testes
 function reset() :void {
     localStorage.clear();
 }
@@ -108,6 +125,6 @@ function reset() :void {
 // funcionalidade para adicionar saldo quando enviar o formulário.
 transactionForm.addEventListener('submit', (e :SubmitEvent) :void => {
     e.preventDefault();
-    addTransactionDOM(textInput.value, +amountInput.value);
+    addTransactionDOM(generateId(), textInput.value, +amountInput.value)();
     alterBalance(+amountInput.value);
 });
