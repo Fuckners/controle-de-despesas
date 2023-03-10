@@ -8,7 +8,7 @@
 
 ## Tencologias usadas 👾
 	
-- Typscript
+- Typescript
 
 ## Sumário:    
 - [Sumário:](#sumário)
@@ -26,7 +26,7 @@
 - [x] Adição de despesas/receitas;
 - [x] Alteração dinâmica de saldo atual;
 - [x] Alteração dinâmica das despesas/receitas;
-- [x] Botões para vizualidar despesas;
+- [x] Botões para visualizar despesas;
 - [x] Armazenamento de dados no localStorage;
 
 <span id="paginas"></span>
